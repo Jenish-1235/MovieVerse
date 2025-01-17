@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Alert,
   TextInput,
   Dimensions,
 } from 'react-native';
@@ -31,17 +32,19 @@ const SearchScreen: React.FC<Props> = ({ navigation }) => {
   // Function to handle search
   const handleSearch = async () => {
     if (searchTerm.trim() === '') {
-      // Optionally, show a message to enter a search term
+      Alert.alert('Input Required', 'Please enter a search term.');
       return;
     }
 
     setLoading(true);
     try {
       const response = await axios.get<SearchResult[]>(`https://api.tvmaze.com/search/shows?q=${searchTerm}`);
+      console.log('Search results:', response.data); // Debugging log
       setMovies(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error searching shows:', error);
+      Alert.alert('Error', 'Failed to search movies. Please try again.');
       setLoading(false);
     }
   };
@@ -53,7 +56,10 @@ const SearchScreen: React.FC<Props> = ({ navigation }) => {
     return (
       <TouchableOpacity
         style={styles.itemContainer}
-        onPress={() => navigation.navigate('Details', { show })}
+        onPress={() => {
+          console.log('Navigating to Details with show:', show);
+          navigation.navigate('Details', { show });
+        }}
       >
         <Image
           source={{
@@ -104,17 +110,20 @@ const SearchScreen: React.FC<Props> = ({ navigation }) => {
       )}
 
       {/* List of Search Results */}
-      <FlatList
-        data={movies}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.show.id.toString()}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={!loading && (
+      {movies.length > 0 ? (
+        <FlatList
+          data={movies}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.show.id.toString()}
+          contentContainerStyle={styles.list}
+        />
+      ) : (
+        !loading && (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No Results Found</Text>
           </View>
-        )}
-      />
+        )
+      )}
     </View>
   );
 };
@@ -185,8 +194,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
   },
   emptyText: {
     color: '#888',
