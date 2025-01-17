@@ -1,6 +1,6 @@
 // src/screens/DetailsScreen.tsx
 import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { HomeStackParamList } from '../navigation/HomeStackNavigator';
 import { SearchStackParamList } from '../navigation/SearchStackNavigator';
@@ -8,8 +8,8 @@ import { Show } from '../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 type DetailsScreenRouteProp =
-  | RouteProp<HomeStackParamList, 'Details'>
-  | RouteProp<SearchStackParamList, 'Details'>;
+  | StackNavigationProp<HomeStackParamList, 'Details'>
+  | StackNavigationProp<SearchStackParamList, 'Details'>;
 
 interface Props {
   route: DetailsScreenRouteProp;
@@ -18,7 +18,12 @@ interface Props {
 
 const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { show } = route.params as { show: Show };
-  console.log('Received show in DetailsScreen:', show); // Debugging log
+
+  if (!show) {
+    Alert.alert('Error', 'No movie details available.');
+    navigation.goBack();
+    return null;
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -39,6 +44,7 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         style={styles.image}
         onError={(error) => {
           console.error('Error loading image:', error.nativeEvent.error);
+          Alert.alert('Error', 'Failed to load movie image.');
         }}
       />
 

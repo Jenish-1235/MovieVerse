@@ -17,7 +17,7 @@ import { HomeStackParamList } from '../navigation/HomeStackNavigator';
 import { Show, SearchResult } from '../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'HomeScreen'>;
+type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
 interface Props {
   navigation: HomeScreenNavigationProp;
