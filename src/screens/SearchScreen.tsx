@@ -18,7 +18,7 @@ import { SearchStackParamList } from '../navigation/SearchStackNavigator';
 import { Show, SearchResult } from '../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-type SearchScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'SearchScreen'>;
+type SearchScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Search'>;
 
 interface Props {
   navigation: SearchScreenNavigationProp;

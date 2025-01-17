@@ -1,28 +1,29 @@
 // src/navigation/HomeStackNavigator.tsx
 import React from 'react';
-import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import DetailsScreen from '../screens/DetailsScreen';
-import { Show } from '../types';
+import SearchScreen from '../screens/SearchScreen';
 
 export type HomeStackParamList = {
-  HomeScreen: undefined;
+  Home: undefined;
   Details: { show: Show };
+  Search: undefined;
 };
 
 const Stack = createStackNavigator<HomeStackParamList>();
 
-const screenOptions: StackNavigationOptions = {
-  headerStyle: { backgroundColor: '#000' },
-  headerTintColor: '#E50914',
-  headerTitleStyle: { fontWeight: 'bold' },
-};
-
-const HomeStackNavigator: React.FC = () => {
+const HomeStackNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={screenOptions}>
-      <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ title: 'Home' }} />
-      <Stack.Screen name="Details" component={DetailsScreen} options={{ title: 'Details' }} />
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false, // Assuming custom headers are used
+      }}
+    >
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailsScreen} />
+      <Stack.Screen name="Search" component={SearchScreen} />
     </Stack.Navigator>
   );
 };

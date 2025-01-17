@@ -3,5 +3,6 @@
 
     <style name="BootSplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/bootsplash</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 </resources>
