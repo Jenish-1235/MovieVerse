@@ -1,0 +1,4 @@
+<resources>
+    <!-- Existing colors -->
+    <color name="bootsplash_background">#000000</color> <!-- Black background -->
+</resources>
