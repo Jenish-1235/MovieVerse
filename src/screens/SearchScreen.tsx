@@ -1,5 +1,5 @@
 // src/screens/SearchScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { SearchStackParamList } from '../navigation/SearchStackNavigator';
 import { Show, SearchResult } from '../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { FavoritesContext } from '../context/FavoritesContext';
 
 type SearchScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Search'>;
 
@@ -28,6 +29,7 @@ const SearchScreen: React.FC<Props> = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [movies, setMovies] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const { addToFavorites, removeFromFavorites, isFavorite } = useContext(FavoritesContext);
 
   // Function to handle search
   const handleSearch = async () => {
@@ -53,27 +55,40 @@ const SearchScreen: React.FC<Props> = ({ navigation }) => {
   const renderItem = ({ item }: { item: SearchResult }) => {
     const { show } = item;
 
+    const toggleFavorite = () => {
+      if (isFavorite(show.id)) {
+        removeFromFavorites(show.id);
+      } else {
+        addToFavorites(show);
+      }
+    };
+
     return (
-      <TouchableOpacity
-        style={styles.itemContainer}
-        onPress={() => {
-          console.log('Navigating to Details with show:', show);
-          navigation.navigate('Details', { show });
-        }}
-      >
-        <Image
-          source={{
-            uri: show.image ? show.image.medium : 'https://via.placeholder.com/210x295?text=No+Image',
+      <View style={styles.gridItem}>
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() => {
+            console.log('Navigating to Details with show:', show);
+            navigation.navigate('Details', { show });
           }}
-          style={styles.thumbnail}
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{show.name}</Text>
-          <Text numberOfLines={3} style={styles.summary}>
-            {show.summary ? show.summary.replace(/<[^>]+>/g, '') : 'No Summary Available'}
-          </Text>
-        </View>
-      </TouchableOpacity>
+        >
+          <Image
+            source={{
+              uri: show.image ? show.image.medium : 'https://via.placeholder.com/210x295?text=No+Image',
+            }}
+            style={styles.thumbnail}
+          />
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{show.name}</Text>
+            <Text numberOfLines={2} style={styles.summary}>
+              {show.summary ? show.summary.replace(/<[^>]+>/g, '') : 'No Summary Available'}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.heartIcon} onPress={toggleFavorite}>
+          <Icon name={isFavorite(show.id) ? 'favorite' : 'favorite-border'} size={24} color="#E50914" />
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -109,12 +124,13 @@ const SearchScreen: React.FC<Props> = ({ navigation }) => {
         <ActivityIndicator size="large" color="#E50914" style={{ marginTop: 20 }} />
       )}
 
-      {/* List of Search Results */}
+      {/* Grid of Search Results */}
       {movies.length > 0 ? (
         <FlatList
           data={movies}
           renderItem={renderItem}
           keyExtractor={(item) => item.show.id.toString()}
+          numColumns={2}
           contentContainerStyle={styles.list}
         />
       ) : (
@@ -131,6 +147,7 @@ const SearchScreen: React.FC<Props> = ({ navigation }) => {
 export default SearchScreen;
 
 const { width } = Dimensions.get('window');
+const ITEM_WIDTH = (width - 30) / 2; // Adjusted for padding and margins
 
 const styles = StyleSheet.create({
   container: {
@@ -166,32 +183,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 20,
   },
+  gridItem: {
+    flex: 1,
+    margin: 5,
+    position: 'relative',
+  },
   itemContainer: {
-    flexDirection: 'row',
-    marginBottom: 15,
     backgroundColor: '#1c1c1c', // Slightly lighter black for items
     borderRadius: 8,
     overflow: 'hidden',
+    width: ITEM_WIDTH,
   },
   thumbnail: {
-    width: 100,
+    width: '100%',
     height: 150,
   },
   textContainer: {
-    flex: 1,
-    marginLeft: 10,
     padding: 5,
-    justifyContent: 'center',
   },
   title: {
     color: '#E50914', // Netflix Red
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
   },
   summary: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12,
+  },
+  heartIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
   emptyContainer: {
     flex: 1,
