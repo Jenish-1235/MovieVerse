@@ -18,6 +18,7 @@ interface Props {
 
 const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { show } = route.params as { show: Show };
+  console.log('Received show in DetailsScreen:', show); // Debugging log
 
   return (
     <ScrollView style={styles.container}>
@@ -36,6 +37,9 @@ const DetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           uri: show.image ? show.image.original : 'https://via.placeholder.com/500x700?text=No+Image',
         }}
         style={styles.image}
+        onError={(error) => {
+          console.error('Error loading image:', error.nativeEvent.error);
+        }}
       />
 
       {/* Movie Details */}

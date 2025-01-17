@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  TextInput,
+  Alert,
   Dimensions,
 } from 'react-native';
 import axios from 'axios';
@@ -31,10 +31,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const fetchAllShows = async () => {
     try {
       const response = await axios.get<SearchResult[]>('https://api.tvmaze.com/search/shows?q=all');
+      console.log('Fetched shows:', response.data); // Debugging log
       setMovies(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching shows:', error);
+      Alert.alert('Error', 'Failed to load movies. Please try again.');
       setLoading(false);
     }
   };
@@ -50,7 +52,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     return (
       <TouchableOpacity
         style={styles.itemContainer}
-        onPress={() => navigation.navigate('Details', { show })}
+        onPress={() => {
+          console.log('Navigating to Details with show:', show);
+          navigation.navigate('Details', { show });
+        }}
       >
         <Image
           source={{
@@ -88,12 +93,18 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       </View>
 
       {/* List of Movies */}
-      <FlatList
-        data={movies}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.show.id.toString()}
-        contentContainerStyle={styles.list}
-      />
+      {movies.length > 0 ? (
+        <FlatList
+          data={movies}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.show.id.toString()}
+          contentContainerStyle={styles.list}
+        />
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No Movies Found</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -155,5 +166,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#888',
+    fontSize: 16,
   },
 });
